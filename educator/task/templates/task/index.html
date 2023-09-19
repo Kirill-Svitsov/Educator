@@ -1,0 +1,44 @@
+{% extends 'task/base.html' %}
+{% load static %}
+
+{% block title %}
+Последние обновления на сайте
+{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center mt-4 mb-4">Последние обновления на сайте</h1>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for task in page_obj %}
+        {% include 'task/includes/task_card.html' with task=task %}
+        {% if forloop.counter|divisibleby:3 and not forloop.last %}
+    </div>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% include 'task/includes/paginator.html' %}
+</div>
+<div class="fullscreen-image">
+    <a href="javascript:void(0);" onclick="toggleFullscreenImage();">
+        <img src="" alt="Fullscreen Image">
+    </a>
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

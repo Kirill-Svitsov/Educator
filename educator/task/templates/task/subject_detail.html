@@ -1,0 +1,30 @@
+{% extends 'task/base.html' %}
+{% load static %}
+
+{% block title %}
+{{ subject.title }}
+{% endblock title %}
+
+{% block content %}
+<style>
+    .card {
+        height: 100%;
+    }
+</style>
+<div class="container">
+    <h1 class="mt-4 mb-4 text-center">{{ subject.title }}</h1>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for task in page_obj %}
+            {% include 'task/includes/task_card.html' with task=task %}
+            {% if forloop.counter|divisibleby:3 and not forloop.last %}
+                </div>
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% include 'task/includes/paginator.html' %}
+</div>
+{% endblock %}
+
+
+
