@@ -18,4 +18,5 @@ urlpatterns = [
     path('profile/<str:username>/', user_profile, name='profile'),
     path('task/create/', create_task, name='create_task'),
     path('task/edit/<int:task_id>/', edit_task, name='edit_task'),
+    path('delete/<int:task_id>/', delete_task, name='delete_task'),
 ]

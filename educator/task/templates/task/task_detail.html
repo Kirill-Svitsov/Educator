@@ -48,12 +48,15 @@
             {% endif %}
         </div>
         <div class="card-footer d-flex justify-content-between">
-            <div class="text-muted">{{ task.author.get_full_name }}</div>
-            <div class="text-muted">{{ task.time_update }}</div>
-            {% if user.is_authenticated and user == task.author %}
-                <a href="{% url 'task:edit_task' task.id %}" class="btn btn-primary">Редактировать</a>
-            {% endif %}
+    <div class="text-muted">{{ task.author.get_full_name }}</div>
+    <div class="text-muted">{{ task.time_update }}</div>
+    {% if user.is_authenticated and user == task.author %}
+        <div class="d-flex">
+            <a href="{% url 'task:edit_task' task.id %}" class="btn btn-primary read-more-btn mx-1">Редактировать</a>
+            <a href="{% url 'task:delete_task' task.id %}" class="btn btn-primary read-more-btn mx-1">Удалить</a>
         </div>
+    {% endif %}
+</div>
     </div>
     <hr>
     <div class="rounded mt-4 p-3 shadow">
