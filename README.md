@@ -1,7 +1,7 @@
 [![GitHub](https://img.shields.io/badge/GitHub-Kirill--Svitsov-blue)](https://github.com/Kirill-Svitsov)
 # Educator
 The project is deployed at the following link:
-[![PythonAnywhere](https://img.shields.io/badge/PythonAnywhere-Kirill--Svitsov-yellow)](https://kirillsvitsov2.pythonanywhere.com/")
+[![PythonAnywhere](https://img.shields.io/badge/PythonAnywhere-Kirill--Svitsov-yellow)](https://kirillsvitsov2.pythonanywhere.com/)
 
 ## Description
 
