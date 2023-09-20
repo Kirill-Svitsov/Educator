@@ -8,6 +8,7 @@
 {% block content %}
 <div class="container">
     <h1 class="text-center mt-4 mb-4">Последние обновления на сайте</h1>
+    <h4 class="text-center mt-4 mb-4">Всего задач: <span>{{ page_obj.paginator.count }}</span></h4>
     <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for task in page_obj %}
         {% include 'task/includes/task_card.html' with task=task %}

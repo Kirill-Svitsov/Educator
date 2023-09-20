@@ -15,6 +15,7 @@ urlpatterns = [
     path('toggle_like/<int:task_id>/', toggle_like, name='toggle_like'),
     path('toggle_dislike/<int:task_id>/', toggle_dislike, name='toggle_dislike'),
     path('load_more_comments/<int:task_id>/', load_more_comments, name='load_more_comments'),
-    path('profile/<str:username>/', profile, name='profile'),
-
+    path('profile/<str:username>/', user_profile, name='profile'),
+    path('task/create/', create_task, name='create_task'),
+    path('task/edit/<int:task_id>/', edit_task, name='edit_task'),
 ]

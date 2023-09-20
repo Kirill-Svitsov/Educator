@@ -1,14 +1,14 @@
 import random
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from django.utils.text import slugify
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 
 from .models import *
-from .forms import CommentForm
+from .forms import CommentForm, TaskForm
 
 MENU = [{'title': 'О сайте', 'url_name': 'about'},
         {'title': 'Добавить статью', 'url_name': 'add_page'},
@@ -213,14 +213,54 @@ def load_more_comments(request, task_id):
     return JsonResponse(data, safe=False)
 
 
-def profile(request, username):
-    author = get_object_or_404(User, username=username)
-    task_list = author.posts.all()
-    paginator = Paginator(task_list, NUMBER_OF_CARDS)
+def user_profile(request, username):
+    user = get_object_or_404(User, username=username)
+    tasks = Task.objects.filter(author=user)
+    paginator = Paginator(tasks, NUMBER_OF_CARDS)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {
-        'author': author,
+        'user': user,
         'page_obj': page_obj,
     }
     return render(request, 'task/profile.html', context)
+
+
+@login_required
+def create_task(request, task_id=None):
+    if task_id is not None:
+        task = get_object_or_404(Task, pk=task_id)
+        if task.author != request.user:
+            return HttpResponseForbidden("You don't have permission to edit this task.")
+    else:
+        task = None
+
+    if request.method == 'POST':
+        form = TaskForm(request.POST, instance=task)
+        if form.is_valid():
+            task = form.save(commit=False)
+            task.author = request.user
+            task.save()
+            return redirect('task:task_detail', task_id=task.pk)
+    else:
+        form = TaskForm(instance=task)
+
+    context = {
+        'form': form,
+        'task': task,
+    }
+    return render(request, 'task/create_task.html', context)
+
+
+def edit_task(request, task_id):
+    task = get_object_or_404(Task, pk=task_id)
+
+    if request.method == 'POST':
+        form = TaskForm(request.POST, instance=task)
+        if form.is_valid():
+            form.save()
+            return redirect('task:task_detail', task_id=task_id)
+    else:
+        form = TaskForm(instance=task)
+
+    return render(request, 'task/edit_task.html', {'form': form, 'task': task})
