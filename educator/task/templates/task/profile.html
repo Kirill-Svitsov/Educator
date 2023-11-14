@@ -6,17 +6,24 @@
 
 {% block content %}
   <div class="container">
-    <h1 class="text-center mt-4 mb-4">Все задачи пользователя {{ user.get_full_name }}</h1>
-    <h4 class="text-center mt-4 mb-4">Всего задач: <span>{{ page_obj.paginator.count }}</span></h4>
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-        {% for task in page_obj %}
-        {% include 'task/includes/task_card.html' with task=task %}
-        {% if forloop.counter|divisibleby:3 and not forloop.last %}
-    </div>
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-        {% endif %}
-        {% endfor %}
-    </div>
-    {% include 'task/includes/paginator.html' %}
-</div>
+    <h1 class="text-center mt-4 mb-4">Профиль пользователя {{ user_profile.get_full_name }}</h1>
+    {% if user == user_profile %}
+      <h4 class="text-center mt-4 mb-4">Всего задач: <span>{{ page_obj.paginator.count }}</span></h4>
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+          {% for task in page_obj %}
+          {% include 'task/includes/task_card.html' with task=task %}
+          {% if forloop.counter|divisibleby:3 and not forloop.last %}
+      </div>
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+          {% endif %}
+          {% endfor %}
+      </div>
+      {% include 'task/includes/paginator.html' %}
+    {% else %}
+      <div class="text-center mt-4 mb-4">
+        <a href="{% url 'task:chat_detail' chat.id %}" class="btn btn-primary">Отправить сообщение</a>
+      </div>
+    {% endif %}
+  </div>
 {% endblock content %}
+

@@ -33,8 +33,8 @@ class Task(models.Model):
         verbose_name="Тема",
         related_name='subject'
     )
-    likes = models.ManyToManyField(User, related_name='liked_tasks', blank=True)
-    dislikes = models.ManyToManyField(User, related_name='disliked_tasks', blank=True)
+    # likes = models.ManyToManyField(User, related_name='liked_tasks', blank=True)
+    # dislikes = models.ManyToManyField(User, related_name='disliked_tasks', blank=True)
 
     def __str__(self):
         return self.title
@@ -130,3 +130,39 @@ class Comment(models.Model):
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
         ordering = ['pub_date']
+
+
+class Chat(models.Model):
+    participants = models.ManyToManyField(User, related_name='chats')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Chat {self.id}"
+
+
+class Message(models.Model):
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='messages')
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Message from {self.sender} in Chat {self.chat.id}"
+
+
+class Like(models.Model):
+    user = models.ForeignKey(
+        User,
+        related_name='likes',
+        verbose_name='Пользователь',
+        on_delete=models.CASCADE
+    )
+    task = models.ForeignKey(
+        Task,
+        related_name='likes',
+        verbose_name='Пост',
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return f"Like from {self.user} on post {self.task.title}"

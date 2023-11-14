@@ -34,7 +34,7 @@
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link neon-link-green" href="#">Прочее</a>
+                    <a class="nav-link neon-link-green" href="">Прочее</a>
                 </li>
                 {% if user.is_superuser %}
                 <li class="nav-item">
@@ -46,12 +46,6 @@
                     <a class="nav-link {% if view_name  == 'about:author' %}active{% endif %}"
                        href="{% url 'about:author' %}">
                         Об авторе
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if view_name  == 'about:tech' %}active{% endif %}"
-                       href="{% url 'about:tech' %}">
-                        Технологии
                     </a>
                 </li>
                 {% endwith %}

@@ -2,13 +2,14 @@ import random
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
+from django.views.decorators.http import require_POST
 from django.utils.text import slugify
 from django.http import JsonResponse, HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 
-from .models import *
-from .forms import CommentForm, TaskForm
+from task.models import *
+from task.forms import *
 
 MENU = [{'title': 'О сайте', 'url_name': 'about'},
         {'title': 'Добавить статью', 'url_name': 'add_page'},
@@ -172,30 +173,17 @@ def search_results(request):
     return render(request, 'task/search_results.html', context)
 
 
-def toggle_like(request, task_id):
-    task = get_object_or_404(Task, pk=task_id)
-    user = request.user
-
-    if user.is_authenticated:
-        if task.likes.filter(id=user.id).exists():
-            task.likes.remove(user)
-        else:
-            task.likes.add(user)
-
-    return JsonResponse({'likes_count': task.likes.count()})
-
-
-def toggle_dislike(request, task_id):
-    task = get_object_or_404(Task, pk=task_id)
-    user = request.user
-
-    if user.is_authenticated:
-        if task.dislikes.filter(id=user.id).exists():
-            task.dislikes.remove(user)
-        else:
-            task.dislikes.add(user)
-
-    return JsonResponse({'dislikes_count': task.dislikes.count()})
+# def toggle_like(request, task_id):
+#     task = get_object_or_404(Task, pk=task_id)
+#     user = request.user
+#
+#     if user.is_authenticated:
+#         if task.likes.filter(id=user.id).exists():
+#             task.likes.remove(user)
+#         else:
+#             task.likes.add(user)
+#
+#     return JsonResponse({'likes_count': task.likes.count()})
 
 
 def load_more_comments(request, task_id):
@@ -213,15 +201,37 @@ def load_more_comments(request, task_id):
     return JsonResponse(data, safe=False)
 
 
+@login_required
+@require_POST
+def like_toggle(request, task_id):
+    task = get_object_or_404(Task, pk=task_id)
+    user = request.user
+    try:
+        like = Like.objects.get(user=user, task=task)
+        like.delete()
+        liked = False
+    except Like.DoesNotExist:
+        Like.objects.create(user=user, task=task)
+        liked = True
+    like_count = task.likes.count()
+    return JsonResponse({'liked': liked, 'like_count': like_count})
+
+
 def user_profile(request, username):
     user = get_object_or_404(User, username=username)
     tasks = Task.objects.filter(author=user)
+    # Проверяем, существует ли чат между текущим пользователем и пользователем профиля
+    chat = Chat.objects.filter(participants=request.user).filter(participants=user).first()
+    if not chat:
+        chat = Chat.objects.create()
+        chat.participants.add(request.user, user)
     paginator = Paginator(tasks, NUMBER_OF_CARDS)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {
         'user': user,
         'page_obj': page_obj,
+        'chat': chat,
     }
     return render(request, 'task/profile.html', context)
 
@@ -268,9 +278,38 @@ def edit_task(request, task_id):
 
 def delete_task(request, task_id):
     task = get_object_or_404(Task, id=task_id)
-
     if request.method == 'POST':
         task.delete()
         return redirect('task:home')
 
     return render(request, 'task/delete_task.html', {'task': task})
+
+
+@login_required
+def chat_list(request):
+    chats = Chat.objects.filter(participants=request.user)
+    context = {
+        'chats': chats
+    }
+    return render(request, 'task/chat_list.html', context)
+
+
+@login_required
+def chat_detail(request, chat_id):
+    chat = get_object_or_404(Chat, id=chat_id)
+    messages = Message.objects.filter(chat=chat)
+    form = MessageForm()
+
+    if request.method == 'POST':
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            content = form.cleaned_data['content']
+            sender = request.user
+            message = Message.objects.create(chat=chat, sender=sender, content=content)
+
+    context = {
+        'chat': chat,
+        'messages': messages,
+        'form': form,
+    }
+    return render(request, 'task/chat_detail.html', context)

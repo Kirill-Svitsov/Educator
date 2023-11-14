@@ -1,0 +1,13 @@
+{% extends 'task/base.html' %}
+
+{% block title %}
+  Чат {{ chat.id }}
+{% endblock title %}
+
+{% block content %}
+  <div class="container">
+    <h1>{{ chat.name }}</h1>
+    <div id="chat-messages"></div>
+  </div>
+{% endblock content %}
+

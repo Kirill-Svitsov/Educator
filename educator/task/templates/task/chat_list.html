@@ -1,0 +1,90 @@
+{% extends 'task/base.html' %}
+
+{% block title %}
+Сообщения
+{% endblock title %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3 bg-dark">
+        <!-- Сайдбар с чатами -->
+        <div id="chat-sidebar">
+            <!-- Список чатов -->
+            <ul id="chat-list" class="list-group">
+                {% for chat in chats %}
+                    <li class="list-group-item chat-item" data-chat-id="{{ chat.id }}">
+                        {% if chat.participants.all.count > 2 %}
+                            Групповой чат
+                        {% else %}
+                            Чат с
+                            {% for participant in chat.participants.all %}
+                                {% if participant.username != request.user.username %}
+                                    <span class="participant" data-participant-id="{{ participant.id }}">{{ participant.get_full_name }}</span>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div id="chat-messages-container">
+            <div id="chat-messages">
+                <!-- Сюда будут вставлены сообщения из JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+#chat-sidebar {
+  height: 100vh;
+  overflow-y: auto;
+  border-right: 1px solid #ccc;
+}
+
+#chat-list {
+  list-style: none;
+  padding: 0;
+}
+
+.chat-item {
+  cursor: pointer;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.chat-item.active {
+  background-color: #f0f0f0;
+}
+
+
+
+#chat-sidebar {
+    background-color: #343a40; /* Цвет фона сайдбара */
+    height: 100vh; /* Высота сайдбара равная высоте видимой области экрана */
+    overflow-y: auto; /* Добавление прокрутки в сайдбаре, если чатов много */
+}
+
+#chat-list {
+    list-style-type: none; /* Убираем маркеры у списка чатов */
+    padding: 0;
+}
+
+.chat-item {
+    color: #ffffff; /* Цвет текста чатов в сайдбаре */
+    cursor: pointer; /* Изменение курсора при наведении на чат */
+    padding: 8px 16px; /* Отступы вокруг текста чата */
+}
+
+.chat-item:hover {
+    background-color: #495057; /* Цвет фона при наведении на чат */
+}
+
+
+</style>
+

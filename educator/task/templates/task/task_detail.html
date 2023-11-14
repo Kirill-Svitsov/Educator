@@ -1,5 +1,5 @@
 {% extends 'task/base.html' %}
-
+{% load static %}
 {% block title %}
 {{ task.title }}
 {% endblock title %}
@@ -48,15 +48,34 @@
             {% endif %}
         </div>
         <div class="card-footer d-flex justify-content-between">
-    <div class="text-muted">{{ task.author.get_full_name }}</div>
-    <div class="text-muted">{{ task.time_update }}</div>
-    {% if user.is_authenticated and user == task.author %}
-        <div class="d-flex">
-            <a href="{% url 'task:edit_task' task.id %}" class="btn btn-primary read-more-btn mx-1">Редактировать</a>
-            <a href="{% url 'task:delete_task' task.id %}" class="btn btn-primary read-more-btn mx-1">Удалить</a>
+            <div class="text-muted">
+                <a href="{% url 'task:profile' username=task.author %}" class="link-dark">Автор: {{ task.author }}</a>
+            </div>
+            <div class="text-muted">{{ task.time_update }}</div>
+            {% if user.is_authenticated and user == task.author %}
+            <div class="d-flex">
+                <a href="{% url 'task:edit_task' task.id %}"
+                   class="btn btn-primary read-more-btn mx-1">Редактировать</a>
+                <a href="{% url 'task:delete_task' task.id %}" class="btn btn-primary read-more-btn mx-1">Удалить</a>
+            </div>
+            {% endif %}
         </div>
-    {% endif %}
-</div>
+        <div class="card-footer">
+            <div class="d-flex justify-content-between">
+                <div class="like-dislike">
+                    <button class="like-button" data-task-id="{{ task.id }}">
+                        <i class="far fa-thumbs-up"></i>
+                    </button>
+                    <span class="likes-count">{{ task.likes.count }}</span>
+                </div>
+                <!--<div class="like-dislike">
+                    <button class="dislike-button" data-task-id="{{ task.id }}">
+                        <i class="far fa-thumbs-down"></i>
+                    </button>
+                    <span class="dislikes-count">{{ task.dislikes.count }}</span>
+                </div>-->
+            </div>
+        </div>
     </div>
     <hr>
     <div class="rounded mt-4 p-3 shadow">
@@ -138,9 +157,26 @@
     });
 
 
+
+
 </script>
 {% endblock %}
+<style>
+.like-button, .dislike-button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 1.5em; /* Размер иконки */
+    color: #000; /* Цвет иконки */
+}
 
+.like-button:focus, .dislike-button:focus {
+    outline: none;
+}
+.like-button i, .dislike-button i {
+    border: none;
+}
+</style>
 
 
 
